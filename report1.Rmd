@@ -1,0 +1,92 @@
+---
+title: "Project Details"
+output: pdf_document
+params:
+  output1: NA
+  output2: NA
+  output3: NA
+  output4: NA
+  output5: NA
+  output6: NA
+  output7: NA
+  output8: NA
+  output9: NA
+  output10: NA
+  output11: NA
+  output12: NA
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = FALSE, comment=NA)
+library(formattable)
+library(tidyverse)
+library(scales)
+```
+
+### Project Name
+
+```{r, echo=F}
+cat(params$output6, "\n")
+```
+
+### Type
+
+```{r, echo=F}
+cat(params$output7, "\n")
+```
+
+### Size
+
+```{r, echo=F}
+cat(params$output8, "\n")
+```
+
+### Did this project screen?
+
+```{r, echo=F}
+cat(params$output1, "\n")
+```
+
+### Project VMT
+
+```{r, echo=F}
+cat(params$output2, "\n")
+```
+
+### Standard of Significance VMT
+
+```{r, echo=F}
+cat(params$output3, "\n")
+```
+
+
+### VMT Mitigation Needed
+
+```{r, echo=F}
+cat(params$output4, "\n")
+```
+
+
+### Mobility Fee 
+
+```{r, echo=F}
+cat(params$output5, "\n")
+```
+
+### Located in Town/Regional Center
+
+```{r, echo=F}
+cat(params$output10)
+```
+
+### Located in Bonus Unit Eligible Area
+
+```{r, echo=F}
+cat(params$output11)
+```
+
+### Low Income Units
+
+```{r, echo=F}
+cat(params$output12)
+```
