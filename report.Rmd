@@ -12,6 +12,9 @@ params:
   output9: NA
   output10: NA
   output11: NA
+  output_jur: NA
+  output_apn: NA
+  output_mit_names: NA
  # output12: NA
 ---
 
@@ -20,6 +23,14 @@ knitr::opts_chunk$set(echo = FALSE, comment=NA)
 library(formattable)
 library(tidyverse)
 library(scales)
+```
+
+The tool provides initial screening for all project types and more detailed analysis for residential, tourist accommodation unit, and public service projects.  All non-screened commercial, recreation, and other projects will need to complete a more detailed transportation analysis. For detailed information on the PIA  framework, tool usage, and calculations see the User Guidelines.
+
+### Date Submitted
+
+```{r, echo=F}
+cat(date())
 ```
 
 ### Project Name
@@ -84,14 +95,27 @@ cat(params$output10)
 cat(params$output11)
 ```
 
-### Low Income Units
+### Jurisdiction
 
 ```{r, echo=F}
-#cat(params$output12)
+cat(params$output_jur)
 ```
 
-### Mitigations
+### Parcel Number (APN)
+
+```{r, echo=F}
+cat(params$output_apn)
+```
+
+### Mitigation Categories 
+
+```{r, echo=F}
+cat(params$output_mit_names)
+```
+
+### Mitigations Values
 
 ```{r, echo=F}
 cat(params$output9)
 ```
+

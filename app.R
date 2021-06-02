@@ -24,6 +24,8 @@ library(leafgl)
 
 #### load data ####
 
+pm_sf<-st_read(dsn="H:\\model\\project_level_analysis", "parcel_master_5_25_21") %>%
+  st_transform(crs=4326)
 
 pm<-read.dbf("H:\\model\\project_level_analysis\\parcel_master2.dbf")
 
@@ -243,6 +245,17 @@ dataset <- length_jur %>% select(zone_id, zone_no, avg_zone_trip_length,threshol
 dataset_full <- length_jur_full %>% select(zone_id, zone_no, avg_zone_trip_length,threshold_15_below ) %>%
   left_join(res_data_sf %>% data.frame() %>% select(zone_id,zone_vmt_per_capita,  sos), by="zone_id")
 
+
+mit_choice<-c("Ride Sharing Program"=.01,
+  "Telecommuting/Alternative Work Schedules"=.0007,
+  "Trip Reduction Marketing"=.008,
+  "Traffic Calming"=.0025, 
+  "Workplace Parking Pricing"=.001, 
+  "Employee Sponsored Vanpool/Shuttle"=.005 ,
+  "Employee Shuttle"=.005 ,
+  "Vanpool Incentives"=.003 ,
+  "Targeted Behavior Interventions"=.008)
+
 #### --------------------------- ####
 
 ui <- dashboardPage(skin="black", 
@@ -294,7 +307,7 @@ ui <- dashboardPage(skin="black",
             uiOutput("ui_redev_land_use"),
             uiOutput("ui_redev_units"),
             uiOutput("ui_mitigations"),
-            downloadButton("report_button", "Export Project Info"),
+            downloadButton("report_button", "Export Project Info") %>% withSpinner(),
             radioButtons('format', '', c('PDF', 'HTML', 'Word'),inline = TRUE),
             width=12))),
     column(width=10,
@@ -578,15 +591,7 @@ server <- function(input, output,session) {
   output$ui_mitigations <-renderUI({
     req(input$map_shape_click, input$proj_type)
     checkboxGroupInput(inputId="mitigations", label="Select Mitigations", selected="None",
-                       choices=c("Ride Sharing Program"=.01,
-                                 "Telecommuting/Alternative Work Schedules"=.0007,
-                                 "Trip Reduction Marketing"=.008,
-                                 "Traffic Calming"=.0025, 
-                                 "Workplace Parking Pricing"=.001, 
-                                 "Employee Sponsored Vanpool/Shuttle"=.005 ,
-                                 "Employee Shuttle"=.005 ,
-                                 "Vanpool Incentives"=.003 ,
-                                 "Targeted Behavior Interventions"=.008))
+                       choices=mit_choice)
   })
   output$ui_redevelopment <-renderUI({
     req(input$map_shape_click, input$proj_type)
@@ -1380,6 +1385,8 @@ screened3 <- reactive({
   {print("No")
   }
 })
+name_of_mit <- reactive({paste(names(mit_choice[mit_choice==input$mitigations]), collapse=", ")
+  })
 output$report_button <- downloadHandler(
   filename = function() {
     paste('my-report', sep = '.', switch(
@@ -1409,7 +1416,8 @@ output$report_button <- downloadHandler(
         } else if(input$proj_type == "Residential"){
           paste(comma(input$res_units,0), "Residential Units", sep=" ")
         },
-      output9= paste(input$mitigations, collapse=", "),
+      output9= paste(percent(input$mitigations,4), collapse=", "),
+      output_mit_names= name_of_mit(),
       output10= if(nrow(town_reg_buffer()) > 0){
         "Yes"
       } else {
@@ -1417,7 +1425,9 @@ output$report_button <- downloadHandler(
       },
       output11= if(nrow(transit()) > 0){
         "Yes"
-      } else {"No"}#,
+      } else {"No"},
+      output_jur= st_join(proj_loc(), st_buffer(jur %>% dplyr::select("name"),.00001), largest=T) %>% pull(name),
+      output_apn= st_join(proj_loc(), st_buffer(pm_sf %>% dplyr::select("APN"),.00001), largest=T) %>% pull(APN)
      # output12= if(input$low_income_screen == TRUE){
        # "Yes"
      # }else if(input$low_income_screen == FALSE ){
@@ -1433,10 +1443,10 @@ output$report_button <- downloadHandler(
 }
 shinyApp(ui, server)
 
-pm<-st_read(dsn="H:\\model\\project_level_analysis", "parcel_master_5_25_21") %>%
-  st_transform(crs=4326) %>%
-  st_cast("MULTILINESTRING")%>%
-  st_cast("LINESTRING")
+#pm<-st_read(dsn="H:\\model\\project_level_analysis", "parcel_master_5_25_21") %>%
+  #st_transform(crs=4326) %>%
+ # st_cast("MULTILINESTRING")%>%
+ # st_cast("LINESTRING")
 
-
+st_join(test, st_buffer(pm_sf %>% dplyr::select("APN"),.00001), largest=T) %>% pull(APN)
 
